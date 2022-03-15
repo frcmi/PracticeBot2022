@@ -19,8 +19,8 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public class Robot extends TimedRobot {
   boolean DualStickDrive = false;
-  boolean XboxDrive = true;
-  boolean OneStickDrive = false;
+  boolean XboxDrive = false;
+  boolean OneStickDrive = true;
   boolean SliderDrive = false;
 
   private DifferentialDrive m_myRobot;
@@ -31,15 +31,10 @@ public class Robot extends TimedRobot {
   MotorControllerGroup leftMotors = new MotorControllerGroup(m_frontLeft, m_rearLeft);
   MotorControllerGroup rightMotors = new MotorControllerGroup(m_frontRight, m_rearRight);
 
-  //Joystick m_leftStick = new Joystick(0);
-  Joystick m_leftStick = new Joystick(1);
-
-
-
   Joystick m_leftStick = new Joystick(0);
   Joystick m_rightStick = new Joystick(1);
-  XboxController xbox = new XboxController(1);
-  
+  XboxController xbox = new XboxController(0);
+
   @Override
   public void robotInit() {
     // We need to invert one side of the drivetrain so that positive voltages
@@ -48,38 +43,46 @@ public class Robot extends TimedRobot {
 
     m_myRobot = new DifferentialDrive(leftMotors, rightMotors);
 
-    
   }
 
   @Override
   public void teleopPeriodic() {
-  
-    if(XboxDrive){
+
+    if (XboxDrive) {
       leftMotors.setInverted(true);
-      m_myRobot.tankDrive(0.925 * 0.8 * (xbox.getRawAxis(1)), 0.8 * (xbox.getRawAxis(5)));
-    } 
-    if(DualStickDrive){
+      m_myRobot.tankDrive(0.95 * 0.8 * (xbox.getRawAxis(1)), 0.8 * (xbox.getRawAxis(5)));
+    }
+
+    if (DualStickDrive) {
       leftMotors.setInverted(true);
       m_myRobot.tankDrive(0.8 * (m_leftStick.getRawAxis(1)), 0.8 * (m_rightStick.getRawAxis(1)));
     }
+
     if (OneStickDrive) {
-      m_myRobot.tankDrive(0.8*(-(m_leftStick.getY()+ m_leftStick.getX())), 0.8* (m_leftStick.getY()+ m_leftStick.getX()));
+      if (m_leftStick.getY() >= -0.2 && m_leftStick.getY() <= 0.2) {
+        m_myRobot.tankDrive(0.8 * (-(m_leftStick.getY()) + m_leftStick.getX()),
+            0.8 * (m_leftStick.getY() + m_leftStick.getX()));
+      } else {
+        m_myRobot.tankDrive(0.8 * (-(m_leftStick.getY()) + 0.5 * m_leftStick.getX()),
+            0.95 * (0.8 * (m_leftStick.getY() + 0.5 * m_leftStick.getX())));
+      }
+
     }
-    if(SliderDrive) {
+
+    if (SliderDrive) {
       leftMotors.setInverted(true);
-      if(m_leftStick.getRawAxis(3) > 0.75 || m_leftStick.getRawAxis(3) < -0.75) {
+      if (m_leftStick.getRawAxis(3) > 0.75 || m_leftStick.getRawAxis(3) < -0.75) {
         leftMotors.set(m_leftStick.getRawAxis(3) * 0.8);
       }
-      if(m_rightStick.getRawAxis(3) > 0.75 || m_rightStick.getRawAxis(3) < -0.75) {
+      if (m_rightStick.getRawAxis(3) > 0.75 || m_rightStick.getRawAxis(3) < -0.75) {
         rightMotors.set(m_rightStick.getRawAxis(3) * 0.8);
       }
-      }
-      
-
-      /*
-      leftMotors.set(0.875 * 0.85);
-      rightMotors.setInverted(true);
-      rightMotors.set(0.85);
-      */
     }
+
+    /*
+     * leftMotors.set(0.875 * 0.85);
+     * rightMotors.setInverted(true);
+     * rightMotors.set(0.85);
+     */
   }
+}
