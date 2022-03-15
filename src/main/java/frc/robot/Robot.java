@@ -31,6 +31,8 @@ public class Robot extends TimedRobot {
   MotorControllerGroup leftMotors = new MotorControllerGroup(m_frontLeft, m_rearLeft);
   MotorControllerGroup rightMotors = new MotorControllerGroup(m_frontRight, m_rearRight);
 
+  //Joystick m_leftStick = new Joystick(0);
+  Joystick m_leftStick = new Joystick(1);
 
 
 
