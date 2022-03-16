@@ -3,14 +3,24 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+
+import java.util.Map;
+
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.*;
-import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class,
@@ -18,10 +28,11 @@ import edu.wpi.first.wpilibj.XboxController;
  * the code necessary to operate a robot with tank drive.
  */
 public class Robot extends TimedRobot {
-  boolean DualStickDrive = false;
-  boolean XboxDrive = false;
-  boolean OneStickDrive = true;
-  boolean SliderDrive = false;
+  SendableChooser driveChooser = new SendableChooser<Double>();
+
+  NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  NetworkTable driveTable = inst.getTable("drivetable");
+  NetworkTableEntry driveEntry = driveTable.getEntry("driveentry");
 
   private DifferentialDrive m_myRobot;
   WPI_VictorSPX m_rearRight = new WPI_VictorSPX(1);
@@ -42,23 +53,29 @@ public class Robot extends TimedRobot {
     // gearbox is constructed, you might have to invert the left side instead.
 
     m_myRobot = new DifferentialDrive(leftMotors, rightMotors);
+    driveChooser.addOption("One Stick", 1.0);
+    driveChooser.addOption("Dual Stick", 2.0);
+    driveChooser.addOption("Xbox", 3.0);
+    driveChooser.addOption("Xbox One Stick", 4.0);
+
+    driveEntry = Shuffleboard.getTab("Drive Mode")
+        .addPersistent("Mode", driveChooser)
+        .withWidget(BuiltInWidgets.kComboBoxChooser)
+        .getEntry();
 
   }
 
   @Override
   public void teleopPeriodic() {
+    double driveMode = driveEntry.getDouble(1.0);
 
-    if (XboxDrive) {
+    if (driveMode == 3.0) {
       leftMotors.setInverted(true);
       m_myRobot.tankDrive(0.95 * 0.8 * (xbox.getRawAxis(1)), 0.8 * (xbox.getRawAxis(5)));
-    }
-
-    if (DualStickDrive) {
+    } else if (driveMode == 2.0) {
       leftMotors.setInverted(true);
       m_myRobot.tankDrive(0.8 * (m_leftStick.getRawAxis(1)), 0.8 * (m_rightStick.getRawAxis(1)));
-    }
-
-    if (OneStickDrive) {
+    } else if (driveMode == 1.0) {
       if (m_leftStick.getY() >= -0.2 && m_leftStick.getY() <= 0.2) {
         m_myRobot.tankDrive(0.8 * (-(m_leftStick.getY()) + m_leftStick.getX()),
             0.8 * (m_leftStick.getY() + m_leftStick.getX()));
@@ -66,23 +83,11 @@ public class Robot extends TimedRobot {
         m_myRobot.tankDrive(0.8 * (-(m_leftStick.getY()) + 0.5 * m_leftStick.getX()),
             0.95 * (0.8 * (m_leftStick.getY() + 0.5 * m_leftStick.getX())));
       }
-
-    }
-
-    if (SliderDrive) {
+    } else if (driveMode == 4.0) {
       leftMotors.setInverted(true);
-      if (m_leftStick.getRawAxis(3) > 0.75 || m_leftStick.getRawAxis(3) < -0.75) {
-        leftMotors.set(m_leftStick.getRawAxis(3) * 0.8);
-      }
-      if (m_rightStick.getRawAxis(3) > 0.75 || m_rightStick.getRawAxis(3) < -0.75) {
-        rightMotors.set(m_rightStick.getRawAxis(3) * 0.8);
-      }
+      m_myRobot.tankDrive(
+          xbox.getRightTriggerAxis() * ((0.95 * 0.8 * xbox.getRawAxis(1)) + (0.95 * 0.8 * xbox.getRawAxis(2))),
+          xbox.getRightTriggerAxis() * ((0.95 * 0.8 * xbox.getRawAxis(1)) - (0.95 * 0.8 * xbox.getRawAxis(2))));
     }
-
-    /*
-     * leftMotors.set(0.875 * 0.85);
-     * rightMotors.setInverted(true);
-     * rightMotors.set(0.85);
-     */
   }
 }
