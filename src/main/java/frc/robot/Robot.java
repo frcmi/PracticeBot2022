@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Map;
 
@@ -58,10 +59,12 @@ public class Robot extends TimedRobot {
     driveChooser.addOption("Xbox", 3.0);
     driveChooser.addOption("Xbox One Stick", 4.0);
 
-    driveEntry = Shuffleboard.getTab("Drive Mode")
+    /*driveEntry = Shuffleboard.getTab("Drive Mode")
         .addPersistent("Mode", driveChooser)
         .withWidget(BuiltInWidgets.kComboBoxChooser)
-        .getEntry();
+        .getEntry(); */
+
+    SmartDashboard.putData(driveChooser);
 
   }
 
@@ -72,10 +75,15 @@ public class Robot extends TimedRobot {
     if (driveMode == 3.0) {
       leftMotors.setInverted(true);
       m_myRobot.tankDrive(0.95 * 0.8 * (xbox.getRawAxis(1)), 0.8 * (xbox.getRawAxis(5)));
-    } else if (driveMode == 2.0) {
+      System.out.println("xbox");
+    } 
+    if (driveMode == 2.0) {
+      System.out.println("two stick");
       leftMotors.setInverted(true);
       m_myRobot.tankDrive(0.8 * (m_leftStick.getRawAxis(1)), 0.8 * (m_rightStick.getRawAxis(1)));
-    } else if (driveMode == 1.0) {
+    }
+    if (driveMode == 1.0) {
+      System.out.println("one stick");
       if (m_leftStick.getY() >= -0.2 && m_leftStick.getY() <= 0.2) {
         m_myRobot.tankDrive(0.8 * (-(m_leftStick.getY()) + m_leftStick.getX()),
             0.8 * (m_leftStick.getY() + m_leftStick.getX()));
@@ -83,11 +91,13 @@ public class Robot extends TimedRobot {
         m_myRobot.tankDrive(0.8 * (-(m_leftStick.getY()) + 0.5 * m_leftStick.getX()),
             0.95 * (0.8 * (m_leftStick.getY() + 0.5 * m_leftStick.getX())));
       }
-    } else if (driveMode == 4.0) {
+    }
+    if (driveMode == 4.0) {
       leftMotors.setInverted(true);
       m_myRobot.tankDrive(
           xbox.getRightTriggerAxis() * ((0.95 * 0.8 * xbox.getRawAxis(1)) + (0.95 * 0.8 * xbox.getRawAxis(2))),
           xbox.getRightTriggerAxis() * ((0.95 * 0.8 * xbox.getRawAxis(1)) - (0.95 * 0.8 * xbox.getRawAxis(2))));
+          System.out.println("xbox one stick");
     }
   }
 }
