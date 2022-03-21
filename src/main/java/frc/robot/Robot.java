@@ -20,8 +20,9 @@ import edu.wpi.first.wpilibj.XboxController;
 public class Robot extends TimedRobot {
   boolean DualStickDrive = false;
   boolean XboxDrive = false;
-  boolean OneStickDrive = true;
+  boolean OneStickDrive = false;
   boolean SliderDrive = false;
+  boolean XboxOneStick = true;
 
   private DifferentialDrive m_myRobot;
   WPI_VictorSPX m_rearRight = new WPI_VictorSPX(1);
@@ -51,6 +52,32 @@ public class Robot extends TimedRobot {
     if (XboxDrive) {
       leftMotors.setInverted(true);
       m_myRobot.tankDrive(0.95 * 0.8 * (xbox.getRawAxis(1)), 0.8 * (xbox.getRawAxis(5)));
+    }
+
+    if (XboxOneStick) {
+      rightMotors.setInverted(true);
+
+      while(xbox.getRawButton(5)){
+        //System.out.println("slide");
+        if (xbox.getRawAxis(0) > 0){
+          m_myRobot.tankDrive(xbox.getRightTriggerAxis(), 
+                              (-(xbox.getRightTriggerAxis())));
+          
+        } else if (xbox.getRawAxis(0) < 0) {
+          m_myRobot.tankDrive((-(xbox.getRightTriggerAxis())), 
+                              xbox.getRightTriggerAxis()); 
+        }
+      }
+
+      if (xbox.getRawAxis(0) > 0){
+        m_myRobot.tankDrive(xbox.getRightTriggerAxis() - xbox.getLeftTriggerAxis() + (0.75 * xbox.getRawAxis(0)), 
+                            xbox.getRightTriggerAxis() - xbox.getLeftTriggerAxis());
+      } else {
+        m_myRobot.tankDrive(xbox.getRightTriggerAxis() - xbox.getLeftTriggerAxis(), 
+                            xbox.getRightTriggerAxis() - xbox.getLeftTriggerAxis() + (-0.75 * xbox.getRawAxis(0)));
+      }
+
+      
     }
 
     if (DualStickDrive) {
