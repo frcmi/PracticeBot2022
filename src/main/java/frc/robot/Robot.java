@@ -11,6 +11,20 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.*;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.PIDController;
+import java.nio.file.Path;
+import java.nio.file.FileSystems;
+import java.io.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Filesystem;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class,
@@ -36,6 +50,9 @@ public class Robot extends TimedRobot {
   Joystick m_rightStick = new Joystick(1);
   XboxController xbox = new XboxController(0);
 
+  String trajectoryJSON = "paths/2ball.wpilib.json";
+  Trajectory trajectory = new Trajectory();
+  
   @Override
   public void robotInit() {
     // We need to invert one side of the drivetrain so that positive voltages
@@ -43,7 +60,22 @@ public class Robot extends TimedRobot {
     // gearbox is constructed, you might have to invert the left side instead.
 
     m_myRobot = new DifferentialDrive(leftMotors, rightMotors);
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+   } catch (IOException ex) {
+      System.out.println("Unable to open trajectory");
+   }
 
+  }
+
+  @Override
+  public void autonomousInit() {
+
+  }
+
+  @Override
+  public void autonomousPeriodic() {
   }
 
   @Override
