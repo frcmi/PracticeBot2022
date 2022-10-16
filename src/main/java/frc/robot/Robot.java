@@ -49,7 +49,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    m_myRobot.checkMotors();
+    //probably not needed periodic motor check to stop the drivetrain shutting itself down
+    //m_myRobot.checkMotors();
 
     if (XboxDualStickDrive) {
       leftMotors.setInverted(true);
