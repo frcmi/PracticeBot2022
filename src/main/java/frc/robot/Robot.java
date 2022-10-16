@@ -49,6 +49,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
+    m_myRobot.checkMotors();
+
     if (XboxDualStickDrive) {
       leftMotors.setInverted(true);
       m_myRobot.tankDrive(0.95 * 0.8 * (xbox.getRawAxis(1)), 0.8 * (xbox.getRawAxis(5)));
